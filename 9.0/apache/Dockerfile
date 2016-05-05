@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
 
 # https://doc.owncloud.org/server/8.1/admin_manual/installation/source_installation.html#prerequisites
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-	&& docker-php-ext-install gd intl mbstring mcrypt mysql opcache pdo_mysql pdo_pgsql pgsql zip
+	&& docker-php-ext-install gd exif intl mbstring mcrypt mysql opcache pdo_mysql pdo_pgsql pgsql zip
 
 RUN docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu \
  	&& docker-php-ext-install ldap
@@ -38,7 +38,7 @@ RUN pecl install APCu-4.0.10 redis memcached \
 
 RUN a2enmod rewrite
 
-ENV OWNCLOUD_VERSION 9.0.0
+ENV OWNCLOUD_VERSION 9.0.1
 VOLUME /var/www/html
 
 RUN curl -fsSL -o owncloud.tar.bz2 \
