@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
 	libfreetype6-dev \
 	libicu-dev \
 	libjpeg-dev \
+	libldap2-dev \
 	libmcrypt-dev \
 	libmemcached-dev \
 	libpng12-dev \
@@ -16,7 +17,8 @@ RUN apt-get update && apt-get install -y \
 
 # https://doc.owncloud.org/server/8.1/admin_manual/installation/source_installation.html#prerequisites
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-	&& docker-php-ext-install gd exif intl mbstring mcrypt mysql opcache pdo_mysql pdo_pgsql pgsql zip
+	&& docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ \
+	&& docker-php-ext-install exif gd intl ldap mbstring mcrypt mysql opcache pdo_mysql pdo_pgsql pgsql zip
 
 RUN docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu \
  	&& docker-php-ext-install ldap
@@ -31,14 +33,16 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
-
-# PECL extensions
-RUN pecl install APCu-4.0.10 redis memcached \
-	&& docker-php-ext-enable apcu redis memcached
-
 RUN a2enmod rewrite
 
-ENV OWNCLOUD_VERSION 9.0.1
+# PECL extensions
+RUN set -ex \
+	&& pecl install APCu-4.0.10 \
+	&& pecl install memcached-2.2.0 \
+	&& pecl install redis-2.2.8 \
+	&& docker-php-ext-enable apcu memcached redis
+
+ENV OWNCLOUD_VERSION 9.0.4
 VOLUME /var/www/html
 
 RUN curl -fsSL -o owncloud.tar.bz2 \
