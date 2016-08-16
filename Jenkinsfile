@@ -8,7 +8,7 @@ node {
 
   docker.withRegistry(registry, registryLogin) {
     stage 'Build'
-    def builtImage = docker.build(image, '-f 9.0/apache/Dockerfile --pull 9.0/apache')
+    def builtImage = docker.build(image, '-f 9.1/apache/Dockerfile --pull 9.1/apache')
 
     if (env.BRANCH_NAME == 'master') {
         stage 'Push'
